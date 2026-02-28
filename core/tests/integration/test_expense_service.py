@@ -164,3 +164,24 @@ def test_total_amount_after_removal():
     assert service.total_amount() == 55
     service.remove_expense(gasto1.id)
     assert service.total_amount() == 25
+
+
+def test_update_expense_with_no_changes():
+    service = create_service()
+    gasto = service.create_expense("Cine", 8.5, "Entrada", date.today())
+
+    service.update_expense(expense_id=gasto.id)
+
+    actualizado = service.list_expenses()[0]
+    assert actualizado.title == "Cine"
+    assert actualizado.amount == 8.5
+    assert actualizado.description == "Entrada"
+
+
+def test_total_by_month_empty_repository():
+    service = create_service()
+
+    totales = service.total_by_month()
+
+    assert totales == {}
+    assert isinstance(totales, dict)

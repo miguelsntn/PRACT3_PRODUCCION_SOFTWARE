@@ -70,3 +70,14 @@ def test_future_date_raises_error():
             description="Gasto del futuro",
             expense_date=fecha_futura,
         )
+
+
+def test_zero_amount_raises_error():
+    with pytest.raises(InvalidAmountError):
+        Expense(
+            id=1,
+            title="Gasto cero",
+            amount=0.0,
+            description="Gratis pero no válido para el sistema",
+            expense_date=date.today(),
+        )
