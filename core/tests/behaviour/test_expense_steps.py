@@ -54,3 +54,44 @@ def check_month_total(context, month_name, expected_total):
 def check_expenses_length(context, expenses):
     total = len(context["db"]._expenses)
     assert expenses == total
+
+
+@when(parsers.parse("actualizo el gasto con id {expense_id:d} sin modificar campos"))
+def update_expense_no_changes(context, expense_id):
+    context["service"].update_expense(expense_id=expense_id)
+
+
+@then(parsers.parse("el gasto con id {expense_id:d} mantiene el título"))
+def check_title_maintained(context, expense_id):
+    expenses = context["service"].list_expenses()
+    expense = next((e for e in expenses if e.id == expense_id), None)
+    assert expense is not None
+    assert expense.title == "Cena"
+
+
+@when(parsers.parse("calculo el total por mes"))
+def calculate_total_by_month_step(context):
+    context["totales_mes"] = context["service"].total_by_month()
+
+
+@then(parsers.parse("el desglose mensual debe estar vacío"))
+def check_empty_totals(context):
+    assert context["totales_mes"] == {}
+
+
+@when(parsers.parse("intento añadir un gasto de {amount:d} euros llamado {title}"))
+def try_add_expense_zero(context, amount, title):
+    try:
+        context["service"].create_expense(
+            title=title, amount=amount, description="", expense_date=date.today()
+        )
+    except Exception as e:
+        context["error"] = e
+
+
+@then(parsers.parse("el sistema debe rechazar la operación por importe inválido"))
+def check_invalid_amount_error(context):
+    assert "error" in context, (
+        "El sistema no lanzó ningún error y debería haberlo hecho"
+    )
+    assert type(context["error"]).__name__ == "InvalidAmountError"

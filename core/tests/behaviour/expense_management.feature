@@ -39,3 +39,20 @@ Feature: Gestión de gastos
     And añado un gasto de 30 euros llamado Zapatos
     And elimino el gasto con id 3
     Then el total de dinero gastado debe ser 40 euros
+
+  Scenario: Actualizar un gasto sin enviar cambios mantiene los datos originales
+    Given un gestor de gastos vacío
+    When añado un gasto de 8 euros llamado Cena
+    And actualizo el gasto con id 1 sin modificar campos
+    Then el gasto con id 1 mantiene el título
+    And el total de dinero gastado debe ser 8 euros
+
+  Scenario: Calcular el total por mes sin gastos registrados
+    Given un gestor de gastos vacío
+    When calculo el total por mes
+    Then el desglose mensual debe estar vacío
+
+  Scenario: Crear un gasto con importe cero
+    Given un gestor de gastos vacío
+    When intento añadir un gasto de 0 euros llamado Gratis
+    Then el sistema debe rechazar la operación por importe inválido
